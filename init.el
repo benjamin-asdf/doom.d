@@ -3,9 +3,6 @@
 (doom!
  :benj-evil
  core
-
-
-
         :input
        layout
 
