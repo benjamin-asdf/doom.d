@@ -1,59 +1,25 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; Place your private configuration here! Remember, you do not need to run 'doom
-;; sync' after modifying this file!
-
-
-;; Some functionality uses this to identify you, e.g. GPG configuration, email
-;; clients, file templates and snippets.
 (setq user-full-name "Benjamin Schwerdtner"
       user-mail-address "Benjamin.Schwerdtner@gmail.com")
 
-;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
-;; are the three important ones:
-;;
-;; + `doom-font'
-;; + `doom-variable-pitch-font'
-;; + `doom-big-font' -- used for `doom-big-font-mode'; use this for
-;;   presentations or streaming.
-;;
-;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
-;; font string. You generally only need these two:
-;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
-;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
-
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
 (setq doom-theme 'doom-one)
-
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
+(setq display-line-numbers-type 'relative)
 
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+;;(setq doom-font
+      ;;(font-spec :family "Source Code Pro" :weight 'normal :height 15))
+
+(setq doom-font (font-spec :family "monospace" :size 16))
 
 
-;; Here are some additional functions/macros that could help you configure Doom:
-;;
-;; - `load!' for loading external *.el files relative to this one
-;; - `use-package!' for configuring packages
-;; - `after!' for running code after a package has loaded
-;; - `add-load-path!' for adding directories to the `load-path', relative to
-;;   this file. Emacs searches the `load-path' when you load packages with
-;;   `require' or `use-package'.
-;; - `map!' for binding new keys
-;;
-;; To get information about any of these functions/macros, move the cursor over
-;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
-;; This will open documentation for it, including demos of how they are used.
-;;
-;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
-;; they are implemented.
-;;
+(setq doom-theme 'doom-monokai-pro)
 
+;; (custom-theme-set-faces!
+;;   'doom-monokai-pro
+;;   '(line-number
+;;     :foreground
+;;     "slateBlue"))
 
 
 (setq which-key-idle-delay 0.2)
@@ -81,6 +47,37 @@
       #'dired-jump)
 
 
+;; (dolist (map '(emacs-lisp-mode-map lisp-interaction-mode-map))
+;;   (map! :map map
+;;         ", e l"
+;;         #'benj/eval-sexp-on-line
+;;         :leader
+;;         "m e f"
+;;         #'eval-defun))
+
+;; (bind-map
+;;    flycheck-mode-map
+;;    :evil-keys ("SPC e")
+;;    :minor-modes (flycheck-mode)
+;;    :evil-states (normal))
+;;
+;;
+
+
+;; (use-package! flycheck
+;;   :defer t
+;;   :init (setq flycheck-command-map-prefix "SPC e")
+;;   :config
+;;   (progn
+;;     (map!
+;;      :leader "e" flycheck-command-map)
+;;     (bind-map
+;;       flycheck-command-map
+;;       :evil-keys ("SPC e")
+;;       :evil-states (normal)
+;;       :minor-modes (flycheck)))
+;;   )
+
 
 
 
@@ -88,13 +85,22 @@
 
 (use-package! evil-lisp-state
   :init
-    (setq evil-lisp-state-global t)
+  (setq evil-lisp-state-global t)
   :config
   (progn
     (benj/set-evil-cursor
      "lisp" '("HotPink1" box))
     (evil-lisp-state-leader "SPC k")))
 
+
+(add-hook!
+  '(emacs-lisp-mode-hook lisp-interaction-mode-hook)
+  (map!
+        :map emacs-lisp-mode-map
+        :localleader
+        (:prefix ("e" . "eval")
+        "l" #'lisp-state-eval-sexp-end-of-line)
+        "L" #'load-library))
 
 
 ;; page-break-lines
@@ -104,3 +110,77 @@
   (progn
     (setq-default page-break-lines-max-width 30)
     (global-page-break-lines-mode 1)))
+
+
+
+(use-package! lispyville
+              :hook (lispy-mode . lispyville-mode)
+              :init
+              (setq lispyville-key-theme
+                    '((operators normal)
+                      c-w
+                      (prettify insert)
+                      (atom-movement t)
+                      slurp/barf-lispy
+                      additional
+                      additional-motions
+                      additional-wrap
+                      additional-insert
+                      escape
+                      text-objects))
+              :config
+              (progn
+                (lispyville-set-key-theme)
+                (require 'targets)
+                (setq targets-text-objects nil)
+                (targets-setup)
+                (targets-define-to lispyville-comment 'lispyville-comment nil object
+                                   :last-key nil
+                                   :bind t :keys ";")
+                (targets-define-to lispyville-atom 'lispyville-atom nil object
+                                   :last-key nil
+                                   :bind t :keys "m")
+                (targets-define-to lispyville-list 'lispyville-list nil object
+                                   :last-key nil
+                                   :bind t :keys "c")
+                (targets-define-to lispyville-sexp 'lispyville-sexp nil object
+                                   :last-key nil
+                                   :bind t :keys "x")
+                (targets-define-to lispyville-function 'lispyville-function nil object
+                                   :last-key nil
+                                   :bind t :keys "f")
+                (targets-define-to lispyville-string 'lispyville-string nil object
+                                   :last-key nil
+                                   :bind t :keys "S")))
+
+
+
+
+
+
+(defun benj/update-evil-mc-cursor-overlays ()
+  "This is a kludge to run `evil-mc-excute-for' for the side effect of updating the
+cursors only."
+  (let ((evil-mc-command '(:name foo))
+        (evil-mc-silence-errors t))
+    (evil-mc-execute-for-all)))
+
+
+
+
+(use-package! paren
+  ;; highlight matching delimiters
+  :hook (doom-first-buffer . show-paren-mode)
+  :config
+  (progn
+    (set-face-foreground 'show-paren-match "White")
+    (set-face-underline 'show-paren-match "White")))
+
+
+
+
+
+(global-visual-line-mode 1)
+
+
+

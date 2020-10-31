@@ -54,3 +54,11 @@
 ;; (package! magit-delta)
 
 (package! page-break-lines)
+
+(package! targets
+  :recipe (:host github :repo "noctuid/targets.el"))
+
+
+
+;; (package! emacs-humanoid-themes
+;;   :recipe (:host github :repo "humanoid-colors/emacs-humanoit-themes"))

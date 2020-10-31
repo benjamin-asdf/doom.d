@@ -36,16 +36,16 @@
        zen
 
        :editor
-       (evil +everywhere)
+       (evil +everywhere +multiple-cursors)
        file-templates
        fold
        ;;(format +onsave)
        ;;god
-       ;;lispy
-       ;;multiple-cursors
+       lispy
+       multiple-cursors
        ;;objed
        ;;parinfer
-       ;;rotate-text
+       rotate-text
        snippets
        ;;word-wrap
 
@@ -104,5 +104,14 @@
        :config
        ;;literate
        (default +evil +bindings +smartparens))
+
+
+(eval
+ `(add-load-path!
+   ,@(mapcar
+     #'file-name-directory
+     (directory-files-recursively
+      "/home/benj/.spacemacs.d/layers"
+      ".el$"))))
 
 (require 'temp-hacks "/home/benj/repos/lisp/doom-home/.doom.d/temp-hacks.el")
